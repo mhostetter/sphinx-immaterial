@@ -80,3 +80,26 @@ def test_classmethod(apigen_make_app):
     assert data.entities[f"{testmod}.Foo.my_method"].group_name == "Methods"
     assert data.entities[f"{testmod}.Foo.my_staticmethod"].group_name == "Methods"
     assert data.entities[f"{testmod}.Foo.my_classmethod"].group_name == "Methods"
+
+
+def test_overridden_inheritance(apigen_make_app):
+    testmod = "python_apigen_test_modules.overridden_inheritance"
+    app = apigen_make_app(
+        confoverrides=dict(
+            python_apigen_default_groups=[
+                ("method:.*", "Methods"),
+            ],
+            python_apigen_modules={
+                testmod: "api/",
+            },
+        ),
+    )
+
+    print(app._status.getvalue())
+    print(app._warning.getvalue())
+
+    data = _get_api_data(app.env)
+
+    print(data.entities.keys())
+    assert f"{testmod}.A.foo" in data.entities
+    assert f"{testmod}.A.bar" in data.entities
